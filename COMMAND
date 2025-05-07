@@ -1,0 +1,3 @@
+COMPLIE COMMAND
+g++ dda_line.cpp -o dda_line -lGL -lGLU -lglut
+./dda_line
