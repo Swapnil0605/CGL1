@@ -1,3 +1,6 @@
 COMPLIE COMMAND
 g++ dda_line.cpp -o dda_line -lGL -lGLU -lglut
 ./dda_line
+
+sudo apt-get install freeglut3 freeglut3-dev
+sudo apt-get install g++
