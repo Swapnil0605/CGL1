@@ -132,3 +132,120 @@ int main(int argc, char** argv) {
     glutMainLoop();
     return 0;
 }
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+#include <GL/glut.h>
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+int X1, Y1, X2, Y2;
+int lineStyle = 0;  // 0 = Simple, 1 = Dotted, 2 = Dashed, 3 = Solid
+
+int sign(int a) {
+    return (a > 0) - (a < 0);
+}
+
+void drawBresenhamLine(int style) {
+    int dx = abs(X2 - X1);
+    int dy = abs(Y2 - Y1);
+    int s1 = sign(X2 - X1);
+    int s2 = sign(Y2 - Y1);
+
+    bool interchange = false;
+    if (dy > dx) {
+        swap(dx, dy);
+        interchange = true;
+    }
+
+    int g = 2 * dy - dx;
+    int x = X1;
+    int y = Y1;
+    int count = 0;
+
+    glClear(GL_COLOR_BUFFER_BIT);
+    glBegin(GL_POINTS);
+
+    for (int i = 0; i <= dx; i++) {
+        bool draw = false;
+        switch (style) {
+            case 0: draw = true; break;               // Simple
+            case 1: draw = (count % 2 == 0); break;   // Dotted
+            case 2: draw = (count % 8 < 5); break;    // Dashed
+            case 3: draw = true; break;               // Solid
+        }
+
+        if (draw)
+            glVertex2i(x, y);
+
+        while (g >= 0) {
+            if (interchange)
+                x += s1;
+            else
+                y += s2;
+            g -= 2 * dx;
+        }
+
+        if (interchange)
+            y += s2;
+        else
+            x += s1;
+        g += 2 * dy;
+        count++;
+    }
+
+    glEnd();
+
+    // Draw axes
+    glLineWidth(2);
+    glBegin(GL_LINES);
+        glVertex2i(320, 0); glVertex2i(320, 480);
+        glVertex2i(0, 240); glVertex2i(640, 240);
+    glEnd();
+
+    glFlush();
+}
+
+void display() {
+    drawBresenhamLine(lineStyle);
+}
+
+void Init() {
+    glClearColor(0.0, 1.0, 0.0, 0.0);    // Green background
+    glColor3f(0.0, 0.0, 0.0);           // Black drawing color
+    gluOrtho2D(0, 640, 0, 480);         // 2D projection
+}
+
+int main(int argc, char** argv) {
+    cout << "Enter Point 1 (X1 Y1): ";
+    cin >> X1 >> Y1;
+    cout << "Enter Point 2 (X2 Y2): ";
+    cin >> X2 >> Y2;
+
+    // Shift origin to screen center
+    X1 += 320; Y1 += 240;
+    X2 += 320; Y2 += 240;
+
+    cout << "\nChoose Line Style:\n";
+    cout << "0 - Simple\n1 - Dotted\n2 - Dashed\n3 - Solid\n";
+    cout << "Enter choice: ";
+    cin >> lineStyle;
+
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    glutInitWindowSize(640, 480);
+    glutInitWindowPosition(100, 100);
+    glutCreateWindow("Bresenham Line Styles - No Mouse");
+
+    Init();
+    glutDisplayFunc(display);
+    glutMainLoop();
+    return 0;
+}
+
